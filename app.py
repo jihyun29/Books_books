@@ -15,5 +15,6 @@ db = client.dbsparta
 def home():
     return render_template('index.html')
 
+#커밋 테스트
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5001, debug=True)
