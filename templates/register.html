@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>*북스북스* 회원가입</title>
+    <!-- Bulma CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css"
+    />
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <style></style>
+    <script>
+      function register() {
+        $.ajax({
+          type: "POST",
+          url: "/api/register",
+          data: {
+            id_give: $("#userid").val(),
+            pw_give: $("#userpw").val(),
+            retype_pw_give: $("#user_pw_retype").val(),
+            nickname_give: $("#usernick").val(),
+          },
+          success: function (response) {
+            // 회원가입 성공시 로그인 화면으로 이동
+            if (response["result"] == "success") {
+              alert("회원가입이 완료되었습니다.");
+              window.location.href = "/login";
+            } else {
+              alert(response["msg"]);
+            }
+          },
+        });
+      }
+      function open_box() {
+        $("#post-box").show();
+      }
+      function close_box() {
+        $("#post-box").hide();
+      }
+    </script>
+  </head>
+  <body>
+    <div class="section has-text-centered">
+      <h1 class="title">회원가입 페이지</h1>
+      <div class="container" style="width: 60%">
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label" for="userid">ID</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="control">
+                <input
+                  type="text"
+                  class="input"
+                  id="userid"
+                  aria-describedby="emailHelp"
+                  placeholder="My ID"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label" for="usernick">NICKNAME</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="control">
+                <input
+                  type="text"
+                  class="input"
+                  id="usernick"
+                  placeholder="My Nickname"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label" for="userpw">PW</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="control">
+                <input
+                  type="password"
+                  class="input"
+                  id="userpw"
+                  placeholder="My Password"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label" for="userpw">Retype-PW</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="control">
+                <input
+                  type="password"
+                  class="input"
+                  id="user_pw_retype"
+                  placeholder="Retype my Password"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="button is-primary" onclick="register()">회원가입</button>
+      </div>
+    </div>
+
+    <!-- <div class="sginup">
+        <button onclick="open_box()">회원 가입</button>
+    </div>
+    <div class="mypost" id="post-box">
+        <div class="form-floating mb-3">
+            <input id="user_id" type="email" class="form-control" placeholder="">
+            <label>아이디를 입력하세요.</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input id="user_pw" type="email" class="form-control" placeholder="">
+            <label>비밀번호를 입력하세요.</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input id="user_pw_retype" type="email" class="form-control" placeholder="">
+            <label>비밀번호를 한번 더 입력하세요.</label>
+        </div>
+        <button onclick="posting()" type="button" class="btn btn-dark">기록하기</button>
+        <button onclick="close_box()" type="button" class="btn btn-outline-dark">닫기</button>
+    </div> -->
+  </body>
+</html>
