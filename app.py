@@ -45,24 +45,24 @@ def api_register():
     nickname_receive = request.form['nickname_give']
     retype_pw_receive = request.form['retype_pw_give']
 
-    if id_receive == "" or pw_receive == "" or nickname_receive == "" or retype_pw_receive == "":
+    if not id_receive or not pw_receive or not nickname_receive or not retype_pw_receive :
         # 필수 입력 항목이 비어 있는지 확인하고, 하나라도 비어 있다면 오류 메시지를 반환함
-        return jsonify({'msg': 'error : 입력되지 않은 값이 있습니다.'})
+        return jsonify({'result': '입력되지 않은 값이 있습니다.'})
     
     if pw_receive != retype_pw_receive:
         # 입력받은 비밀번호가 일치하는지 하고 일치하지 않으면 오류 메세지를 반환함
-        return jsonify({'msg': 'error : 비밀번호가 일치하지 않습니다.'})
+        return jsonify({'result': '비밀번호가 일치하지 않습니다.'})
     
     # 입력받은 사용자 ID가 이미 사용 중인지 확인
-    if db.user.find_one({'id': id_receive}):
-        return jsonify({'msg': 'error : 이미 사용 중인 아이디입니다.'})  # 이미 사용 중인 경우 오류 메시지 반환
+    if db.user.find_one({'$or': [{'id': id_receive}, {'nick': nickname_receive}]}):
+        return jsonify({'result': '이미 사용 중인 아이디 또는 닉네임입니다.'})
 
     pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest() # 비밀번호를 해싱하여 보안 강화
 
     # 사용자 ID가 사용 가능하면, 사용자 정보를 데이터베이스에 저장함
     db.user.insert_one({'id': id_receive, 'pw': pw_hash, 'nick': nickname_receive})
 
-    return jsonify({'result': 'success'}) # 성공 메시지 반환
+    return jsonify({'result': 'success'}) #성공 메세지 반환
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5001, debug=True)

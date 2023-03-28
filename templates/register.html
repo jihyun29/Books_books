@@ -31,7 +31,7 @@
               alert("회원가입이 완료되었습니다.");
               window.location.href = "/login";
             } else { // 화원 가입 실패시 서버로부터 반환 받은 메세지를 alert으로 출력
-              alert(response["msg"]);
+              alert(response["result"]);
             }
           },
         });
