@@ -34,6 +34,10 @@ def home():
 def register():
     return render_template('register.html')
 
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
 # [회원가입 API]
 # id, pw, nickname을 받아서, mongoDB에 저장합니다.
 # 저장하기 전에, pw를 sha256 방법(=단방향 암호화. 풀어볼 수 없음)으로 암호화해서 저장합니다.
@@ -50,6 +54,7 @@ def api_register():
     
     if pw_receive != retype_pw_receive:
         # 입력받은 비밀번호가 일치하는지 하고 일치하지 않으면 오류 메세지를 반환함
+        # 클라이언트에서 처리할 수 있음 -> js로 구현하여 api 요청하는 횟수를 줄이도록 개선 할 것. 
         return jsonify({'result': '비밀번호가 일치하지 않습니다.'})
     
     # 입력받은 사용자 ID가 이미 사용 중인지 확인
@@ -76,17 +81,17 @@ def api_login():
     
     if id_receive == "" or pw_receive == "" or nickname_receive =="":
             # 필수 입력 항목이 비어 있는지 확인하고, 하나라도 비어 있다면 오류 메시지를 반환함
-return jsonify({'msg': 'error : 입력되지 않은 값이 있습니다.'})
+        return jsonify({'msg': 'error : 입력되지 않은 값이 있습니다.'})
 
     user = db.user.find_one({'id': id_receive})
     
     if not user:
     # 사용자 정보가 없으면, 오류 메시지를 반환함
-return jsonify({'msg': 'error : 일치하는 사용자 정보가 없습니다.'})
-        pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest() # 입력받은 비밀번호를 해싱하여 비교함
-        if pw_hash != user['pw']:
+        return jsonify({'msg': 'error : 일치하는 사용자 정보가 없습니다.'})
+    pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest() # 입력받은 비밀번호를 해싱하여 비교함
+    if pw_hash != user['pw']:
     # 비밀번호가 일치하지 않으면, 오류 메시지를 반환함
-    return jsonify({'msg': 'error : 비밀번호가 일치하지 않습니다.'})
+        return jsonify({'msg': 'error : 비밀번호가 일치하지 않습니다.'})
 
 # JWT 토큰 생성
     payload = {
@@ -98,5 +103,5 @@ return jsonify({'msg': 'error : 일치하는 사용자 정보가 없습니다.'}
     return jsonify({'result': 'success', 'token': token})
 
 
-    if __name__ == '__main__':
-        app.run('0.0.0.0', port=5001, debug=True)
+if __name__ == '__main__':
+    app.run('0.0.0.0', port=5001, debug=True)
