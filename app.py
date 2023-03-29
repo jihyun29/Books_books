@@ -1,5 +1,4 @@
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for, flash
-
 app = Flask(__name__)
 
 import requests
@@ -16,7 +15,7 @@ db = client.dbsparta
 # 이 문자열은 서버만 알고있기 때문에, 내 서버에서만 토큰을 인코딩(=만들기)/디코딩(=풀기) 할 수 있습니다.
 SECRET_KEY = 'SPARTA'
 
-# JWT 패키지를 사용합니다. (설치해야할 패키지 이름: PyJWT)
+# JWT 패키지를 사용합니다. (설치해야할 패키지 이름: pyjwt)
 import jwt
 
 # 토큰에 만료시간을 줘야하기 때문에, datetime 모듈도 사용합니다.
@@ -64,5 +63,40 @@ def api_register():
 
     return jsonify({'result': 'success'}) #성공 메세지 반환
 
-if __name__ == '__main__':
-    app.run('0.0.0.0', port=5001, debug=True)
+
+#김보슬 작성
+    # [로그인 API]
+    # id, pw를 받아서, DB에서 조회 후, 맞으면 JWT token을 생성하여 반환합니다.
+    # 만약, 조회된 사용자 정보가 없으면, 오류 메시지를 반환합니다.
+@app.route('/api/login', methods=['POST'])
+def api_login():
+    id_receive = request.form['id_give']
+    pw_receive = request.form['pw_give']
+    nickname_receive = request.form['nickname_give']
+    
+    if id_receive == "" or pw_receive == "" or nickname_receive =="":
+            # 필수 입력 항목이 비어 있는지 확인하고, 하나라도 비어 있다면 오류 메시지를 반환함
+return jsonify({'msg': 'error : 입력되지 않은 값이 있습니다.'})
+
+    user = db.user.find_one({'id': id_receive})
+    
+    if not user:
+    # 사용자 정보가 없으면, 오류 메시지를 반환함
+return jsonify({'msg': 'error : 일치하는 사용자 정보가 없습니다.'})
+        pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest() # 입력받은 비밀번호를 해싱하여 비교함
+        if pw_hash != user['pw']:
+    # 비밀번호가 일치하지 않으면, 오류 메시지를 반환함
+    return jsonify({'msg': 'error : 비밀번호가 일치하지 않습니다.'})
+
+# JWT 토큰 생성
+    payload = {
+    'user_id': str(user['_id']),  # MongoDB document ID를 문자열로 변환하여 사용
+    'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)  # 30분 후 만료
+    }
+    token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
+
+    return jsonify({'result': 'success', 'token': token})
+
+
+    if __name__ == '__main__':
+        app.run('0.0.0.0', port=5001, debug=True)
